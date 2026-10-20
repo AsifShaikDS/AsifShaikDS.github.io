@@ -10,7 +10,7 @@ const entries = (await getCollection('work', (e) => !e.data.draft)).sort(
 
 <Base
   title="Work"
-  description="Case studies: LLM orchestration, agent latency, a state DOT permit workflow, and a regulatory compliance reviewer."
+  description="Case studies: LLM orchestration, agent latency, a permit workflow for a U.S. state department of transportation, and a regulatory compliance reviewer."
   wide
 >
   <section class="page-head">
@@ -29,6 +29,7 @@ const entries = (await getCollection('work', (e) => !e.data.draft)).sort(
       <div class="work-list">
         {entries.map((entry) => (
           <WorkCard
+            headingLevel="h2"
             href={`/work/${entry.id}`}
             title={entry.data.title}
             summary={entry.data.summary}

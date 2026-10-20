@@ -8,14 +8,21 @@ interface Props {
   role: string;
   period: string;
   access: string;
+  /** h3 under a section heading (home); h2 where the cards are the page (work index).
+   *  Named `headingLevel` rather than `as` because `as` is a TypeScript keyword
+   *  and silently breaks Astro's prop inference. */
+  headingLevel?: 'h2' | 'h3';
 }
-const { href, title, summary, role, period, access } = Astro.props;
+const {
+  href, title, summary, role, period, access, headingLevel = 'h3',
+} = Astro.props as Props;
+const Heading = headingLevel;
 ---
 
 <article class="work-card">
-  <h3 class="work-card__title">
+  <Heading class="work-card__title">
     <a href={url(href)}>{title}</a>
-  </h3>
+  </Heading>
   <p class="work-card__summary">{summary}</p>
   <p class="work-card__meta muted">
     <span>{role}</span>
@@ -31,6 +38,7 @@ const { href, title, summary, role, period, access } = Astro.props;
     border-top: 1px solid var(--rule-soft);
   }
   .work-card__title {
+    /* same size whichever level it renders as */
     font-size: var(--step-1);
     margin-bottom: 0.4rem;
   }

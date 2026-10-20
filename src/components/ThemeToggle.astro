@@ -39,18 +39,3 @@
   :global(:root[data-theme='light']) .theme-toggle__to-light { display: none; }
 </style>
 
-<script is:inline>
-  document.querySelectorAll('[data-theme-toggle]').forEach(function (btn) {
-    btn.addEventListener('click', function () {
-      var root = document.documentElement;
-      var dark =
-        root.dataset.theme === 'dark' ||
-        (!root.dataset.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
-      var next = dark ? 'light' : 'dark';
-      root.dataset.theme = next;
-      try {
-        localStorage.setItem('theme', next);
-      } catch (e) {}
-    });
-  });
-</script>

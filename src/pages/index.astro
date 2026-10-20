@@ -19,11 +19,11 @@ const total = (await getCollection('work', (e) => !e.data.draft)).length;
   <section class="hero">
     <div class="shell shell--wide hero__grid">
       <div class="hero__lead">
-        <h1 class="hero__name">{site.name}</h1>
-        <p class="hero__role">{site.role}</p>
-        <p class="hero__intro">{site.headline}</p>
+        <h1 class="hero__name" data-rise style="--rise-step: 0">{site.name}</h1>
+        <p class="hero__role" data-rise style="--rise-step: 1">{site.role}</p>
+        <p class="hero__intro" data-rise style="--rise-step: 2">{site.headline}</p>
       </div>
-      <div class="hero__aside">
+      <div class="hero__aside" data-rise style="--rise-step: 3">
       <p class="hero__tail">{site.intro}</p>
       <ul class="link-row hero__links">
         <li><a href={`mailto:${links.email}`}>{links.email}</a></li>
@@ -36,7 +36,7 @@ const total = (await getCollection('work', (e) => !e.data.draft)).length;
   </section>
 
   <!-- Block 2: Proof strip -->
-  <section class="band" aria-label="At a glance">
+  <section class="band" aria-label="At a glance" data-rise style="--rise-step: 4">
     <div class="shell shell--wide">
       <ul class="proof">
         {proof.map((item) => (

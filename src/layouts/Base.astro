@@ -4,6 +4,7 @@
 import '@fontsource-variable/source-serif-4';
 import '@fontsource-variable/jetbrains-mono';
 import '../styles/global.css';
+import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import { site } from '../data/site';
@@ -29,11 +30,54 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://asifshaikds
     <link rel="canonical" href={canonical.href} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <meta name="author" content={site.name} />
+    <!-- Cross-page fades. Astro turns these off for prefers-reduced-motion. -->
+    <ClientRouter />
+    <script is:inline>
+      // Bound to `document`, which ClientRouter never replaces, and guarded so a
+      // re-executed script cannot double-bind. Listeners attached to elements
+      // inside <body> would silently stop working after the first client-side
+      // navigation, because the body is swapped and the inline script is not re-run.
+      (function () {
+        if (window.__siteBound) return;
+        window.__siteBound = true;
+
+        document.addEventListener('click', function (e) {
+          var btn = e.target && e.target.closest ? e.target.closest('[data-theme-toggle]') : null;
+          if (!btn) return;
+          var root = document.documentElement;
+          var dark =
+            root.dataset.theme === 'dark' ||
+            (!root.dataset.theme && matchMedia('(prefers-color-scheme: dark)').matches);
+          var next = dark ? 'light' : 'dark';
+          root.dataset.theme = next;
+          try { localStorage.setItem('theme', next); } catch (err) {}
+        });
+
+        // The wordmark only hides on the home page, so this reads the DOM rather
+        // than remembering which page it is on.
+        function sync() {
+          var onHome = !!document.querySelector('.site-head__name[data-home]');
+          document.body.classList.toggle('is-scrolled', onHome && window.scrollY > 180);
+        }
+        addEventListener('scroll', sync, { passive: true });
+        document.addEventListener('astro:page-load', sync);
+        if (document.readyState !== 'loading') sync();
+        else document.addEventListener('DOMContentLoaded', sync);
+      })();
+    </script>
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical.href} />
-    <meta name="twitter:card" content="summary" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:image" content={new URL('/og.png', canonical).href} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={`${site.name}, ${site.roleFlat}`} />
+    <!-- summary_large_image, not summary: without an image tag at all the link
+         previewed as bare text in Slack and LinkedIn. -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={new URL('/og.png', canonical).href} />
     <meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#131211" media="(prefers-color-scheme: dark)" />
     <meta name="generator" content={Astro.generator} />
