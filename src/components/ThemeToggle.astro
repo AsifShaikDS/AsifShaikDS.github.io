@@ -1,0 +1,56 @@
+<button
+  class="theme-toggle"
+  type="button"
+  data-theme-toggle
+  aria-label="Switch between light and dark theme"
+>
+  <span class="theme-toggle__to-dark" aria-hidden="true">Dark</span>
+  <span class="theme-toggle__to-light" aria-hidden="true">Light</span>
+</button>
+
+<style>
+  .theme-toggle {
+    font: inherit;
+    font-size: var(--step--1);
+    color: var(--text-soft);
+    background: none;
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 0.15rem 0.65rem;
+    cursor: pointer;
+    line-height: 1.5;
+  }
+  .theme-toggle:hover {
+    color: var(--text);
+    border-color: var(--text-mute);
+  }
+
+  /* The label names the theme you will get, not the one you are in. */
+  .theme-toggle__to-dark { display: inline; }
+  .theme-toggle__to-light { display: none; }
+
+  @media (prefers-color-scheme: dark) {
+    :global(:root:not([data-theme='light'])) .theme-toggle__to-dark { display: none; }
+    :global(:root:not([data-theme='light'])) .theme-toggle__to-light { display: inline; }
+  }
+  :global(:root[data-theme='dark']) .theme-toggle__to-dark { display: none; }
+  :global(:root[data-theme='dark']) .theme-toggle__to-light { display: inline; }
+  :global(:root[data-theme='light']) .theme-toggle__to-dark { display: inline; }
+  :global(:root[data-theme='light']) .theme-toggle__to-light { display: none; }
+</style>
+
+<script is:inline>
+  document.querySelectorAll('[data-theme-toggle]').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var root = document.documentElement;
+      var dark =
+        root.dataset.theme === 'dark' ||
+        (!root.dataset.theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      var next = dark ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try {
+        localStorage.setItem('theme', next);
+      } catch (e) {}
+    });
+  });
+</script>

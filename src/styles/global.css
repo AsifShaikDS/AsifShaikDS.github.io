@@ -1,0 +1,448 @@
+/* ------------------------------------------------------------------
+   Tokens. Light is the base; dark overrides only the colour values.
+   Nothing here needs a build step. It is plain CSS custom properties.
+   ------------------------------------------------------------------ */
+:root {
+  color-scheme: light;
+
+  --bg:        #fbfaf8;
+  --bg-raised: #ffffff;
+  --bg-sunken: #f2f0ec;
+  --text:      #191817;
+  --text-soft: #57534e;
+  --text-mute: #7d766f;
+  --rule:      #e2ded7;
+  --rule-soft: #eeebe5;
+  --accent:    #9a3b12;
+  --accent-bg: #fdf0e8;
+
+  /* Tuned for Source Serif. A `ch` in a serif is noticeably narrower than in
+     the system sans this was first set against, so the number is larger than
+     it looks: this lands at roughly 70 characters, not 78. */
+  --measure: 78ch;
+  --shell: 44rem;
+  --shell-wide: 62rem;
+  --pad: clamp(1.15rem, 5vw, 2rem);
+
+  /* Two families. Serif carries the prose, because this site is mostly
+     writing and a serif says "read this" where a UI sans says "scan this".
+     Mono carries labels, nav and tags. There is deliberately no third. */
+  --font-serif: "Source Serif 4 Variable", ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, SFMono-Regular, Menlo,
+    Consolas, "Liberation Mono", monospace;
+  /* Kept so anything still asking for sans falls back sensibly. */
+  --font-sans: var(--font-serif);
+
+  --step--1: clamp(0.82rem, 0.79rem + 0.13vw, 0.88rem);
+  --step-0:  clamp(1rem, 0.96rem + 0.2vw, 1.09rem);
+  --step-1:  clamp(1.17rem, 1.1rem + 0.33vw, 1.34rem);
+  --step-2:  clamp(1.42rem, 1.28rem + 0.66vw, 1.78rem);
+  --step-3:  clamp(1.75rem, 1.5rem + 1.2vw, 2.5rem);
+  --step-4:  clamp(2.35rem, 1.75rem + 2.6vw, 3.9rem);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg:        #131211;
+    --bg-raised: #1b1a18;
+    --bg-sunken: #201e1c;
+    --text:      #ece8e2;
+    --text-soft: #b3aca3;
+    --text-mute: #8b837a;
+    --rule:      #322f2c;
+    --rule-soft: #262422;
+    --accent:    #f0906a;
+    --accent-bg: #2a1d16;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg:        #131211;
+  --bg-raised: #1b1a18;
+  --bg-sunken: #201e1c;
+  --text:      #ece8e2;
+  --text-soft: #b3aca3;
+  --text-mute: #8b837a;
+  --rule:      #322f2c;
+  --rule-soft: #262422;
+  --accent:    #f0906a;
+  --accent-bg: #2a1d16;
+}
+
+/* ------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------ */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+body {
+  margin: 0;
+  /* The single most common cause of mobile horizontal scroll is a long
+     unbreakable string. Belt and braces, at the root. */
+  overflow-x: hidden;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: var(--step-0);
+  line-height: 1.68;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+img, svg, video, canvas, iframe { max-width: 100%; height: auto; display: block; }
+
+h1, h2, h3, h4 {
+  font-family: var(--font-serif);
+  line-height: 1.16;
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  text-wrap: balance;
+  margin: 0;
+}
+
+p, ul, ol { margin: 0; }
+
+a {
+  color: inherit;
+  text-decoration-color: color-mix(in oklab, var(--accent) 55%, transparent);
+  text-underline-offset: 0.2em;
+  text-decoration-thickness: 1px;
+}
+a:hover { text-decoration-color: var(--accent); }
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+code, pre, kbd { font-family: var(--font-mono); }
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--rule);
+  margin: 0;
+}
+
+/* ------------------------------------------------------------------
+   Layout primitives
+   ------------------------------------------------------------------ */
+.shell {
+  width: 100%;
+  max-width: var(--shell);
+  margin-inline: auto;
+  padding-inline: var(--pad);
+}
+.shell--wide { max-width: var(--shell-wide); }
+
+.stack > * + * { margin-top: var(--gap, 1rem); }
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--bg-raised);
+  color: var(--text);
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--rule);
+  z-index: 50;
+}
+.skip-link:focus { left: 0.5rem; top: 0.5rem; }
+
+/* ------------------------------------------------------------------
+   Shared components
+   ------------------------------------------------------------------ */
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+}
+
+.lede {
+  font-size: var(--step-1);
+  line-height: 1.58;
+  color: var(--text-soft);
+  max-width: var(--measure);
+}
+
+.muted { color: var(--text-mute); }
+
+.tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  color: var(--text-mute);
+  white-space: nowrap;
+}
+.tag--accent {
+  color: var(--accent);
+  background: var(--accent-bg);
+  border-color: color-mix(in oklab, var(--accent) 30%, transparent);
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.link-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  letter-spacing: 0.01em;
+}
+
+.arrow-link {
+  font-weight: 500;
+  text-decoration: none;
+  color: var(--accent);
+}
+.arrow-link::after {
+  content: ' \2192';
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+.arrow-link:hover::after { transform: translateX(3px); }
+
+/* ------------------------------------------------------------------
+   Long-form prose (rendered markdown)
+   ------------------------------------------------------------------ */
+.prose {
+  max-width: var(--measure);
+}
+.prose > * + * { margin-top: 1.1em; }
+.prose h2 {
+  font-size: var(--step-2);
+  margin-top: 2.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--rule-soft);
+}
+.prose h3 {
+  font-size: var(--step-1);
+  margin-top: 2rem;
+}
+.prose h2 + *, .prose h3 + * { margin-top: 0.75rem; }
+.prose ul, .prose ol { padding-left: 1.2rem; }
+.prose li + li { margin-top: 0.45rem; }
+.prose strong { font-weight: 650; color: var(--text); }
+.prose a { color: var(--accent); }
+
+.prose blockquote {
+  margin: 1.5rem 0;
+  padding: 0.9rem 1.1rem;
+  border-left: 2px solid var(--rule);
+  background: var(--bg-sunken);
+  color: var(--text-soft);
+  font-size: var(--step--1);
+  border-radius: 0 4px 4px 0;
+}
+.prose blockquote > * + * { margin-top: 0.6rem; }
+
+.prose :not(pre) > code {
+  font-size: 0.86em;
+  background: var(--bg-sunken);
+  border: 1px solid var(--rule-soft);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  overflow-wrap: break-word;
+}
+
+/* Code and ASCII diagrams scroll inside themselves, never the page. */
+.prose pre {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  overflow-x: auto;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  -webkit-overflow-scrolling: touch;
+}
+.prose pre code { background: none; border: 0; padding: 0; white-space: pre; }
+
+.prose table {
+  /* display:block so a wide markdown table scrolls inside itself
+     instead of pushing the page sideways on a phone. */
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: var(--step--1);
+}
+.prose th, .prose td {
+  text-align: left;
+  padding: 0.5rem 0.75rem 0.5rem 0;
+  border-bottom: 1px solid var(--rule-soft);
+  vertical-align: top;
+}
+
+/* Shiki emits both themes; show the right one. */
+:root[data-theme='dark'] .astro-code,
+:root[data-theme='dark'] .astro-code span {
+  color: var(--shiki-dark) !important;
+  background-color: var(--shiki-dark-bg) !important;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .astro-code,
+  :root:not([data-theme='light']) .astro-code span {
+    color: var(--shiki-dark) !important;
+    background-color: var(--shiki-dark-bg) !important;
+  }
+}
+
+/* ------------------------------------------------------------------
+   Diagrams
+   Real HTML, not SVG and not ASCII: it themes from the same tokens as
+   everything else, the text is selectable and searchable, screen readers
+   get the actual words, and it reflows on a phone instead of scrolling
+   sideways. Authored in markdown as <figure class="dia"> ... </figure>.
+   ------------------------------------------------------------------ */
+.dia {
+  margin: 2.25rem 0;
+  padding: 1.6rem 1.4rem 1.4rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: var(--bg-raised);
+}
+.dia > figcaption {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--rule-soft);
+}
+
+.dia__flow { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
+
+.dia__node {
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  background: var(--bg);
+  padding: 0.7rem 0.95rem;
+}
+.dia__node b {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text);
+}
+.dia__node span {
+  display: block;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--text-soft);
+  margin-top: 0.3rem;
+}
+
+/* The emphasised step: the one the reader should remember. */
+.dia__node--key {
+  border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+  background: var(--accent-bg);
+}
+.dia__node--key b { color: var(--accent); }
+
+.dia__node--muted { border-style: dashed; background: transparent; }
+.dia__node--muted b { color: var(--text-mute); }
+
+/* Vertical connector between steps. */
+.dia__link {
+  align-self: center;
+  width: 1px;
+  height: 1.35rem;
+  background: var(--rule);
+  position: relative;
+}
+.dia__link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -1px;
+  width: 5px;
+  height: 5px;
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  transform: translateX(-50%) rotate(45deg);
+}
+
+/* A row of peers: provider adapters, parallel outcomes. */
+.dia__row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+  gap: 0.6rem;
+}
+.dia__row--two { grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr)); }
+
+.dia__chip {
+  border: 1px solid var(--rule);
+  border-radius: 5px;
+  background: var(--bg);
+  padding: 0.55rem 0.7rem;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--text-soft);
+}
+
+/* Label sitting on a connector: "yes" / "no" / "otherwise". */
+.dia__label {
+  align-self: center;
+  font-family: var(--font-mono);
+  font-size: 0.66rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-mute);
+  padding: 0.35rem 0;
+}
+
+/* Footnote under the whole figure. */
+.dia__note {
+  margin-top: 1.1rem;
+  padding-top: 0.85rem;
+  border-top: 1px dashed var(--rule);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--text-mute);
+}
+
+@media (max-width: 30rem) {
+  .dia { padding: 1.25rem 1rem 1.1rem; }
+  .dia__row { grid-template-columns: 1fr; }
+}

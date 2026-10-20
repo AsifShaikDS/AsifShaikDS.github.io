@@ -1,0 +1,62 @@
+---
+import { url } from '../lib/url';
+
+interface Props {
+  href: string;
+  title: string;
+  summary: string;
+  role: string;
+  period: string;
+  access: string;
+}
+const { href, title, summary, role, period, access } = Astro.props;
+---
+
+<article class="work-card">
+  <h3 class="work-card__title">
+    <a href={url(href)}>{title}</a>
+  </h3>
+  <p class="work-card__summary">{summary}</p>
+  <p class="work-card__meta muted">
+    <span>{role}</span>
+    <span aria-hidden="true">·</span>
+    <span>{period}</span>
+  </p>
+  <p class="work-card__access"><span class="tag">{access}</span></p>
+</article>
+
+<style>
+  .work-card {
+    padding-block: 1.5rem;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .work-card__title {
+    font-size: var(--step-1);
+    margin-bottom: 0.4rem;
+  }
+  /* Whole card is the hit target, but only the title is the link in the a11y tree. */
+  .work-card__title a {
+    text-decoration: none;
+  }
+  .work-card__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  .work-card { position: relative; }
+  .work-card:hover .work-card__title a { color: var(--accent); }
+
+  .work-card__summary {
+    color: var(--text-soft);
+    max-width: var(--measure);
+    margin-bottom: 0.6rem;
+  }
+  .work-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    font-size: var(--step--1);
+    margin-bottom: 0.6rem;
+  }
+  .work-card__access { margin: 0; }
+</style>

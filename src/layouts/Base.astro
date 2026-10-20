@@ -1,0 +1,57 @@
+---
+// Self-hosted variable fonts: no third-party request, no flash of unstyled
+// text, and the site still renders correctly offline.
+import '@fontsource-variable/source-serif-4';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Set on pages whose main column is a single reading measure. */
+  wide?: boolean;
+}
+
+const { title, description = site.description, wide = false } = Astro.props;
+const pageTitle = title ? `${title} · ${site.name}` : `${site.name} · ${site.roleFlat}`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? 'https://asifshaikds.github.io');
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical.href} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="author" content={site.name} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical.href} />
+    <meta name="twitter:card" content="summary" />
+    <meta name="theme-color" content="#fbfaf8" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#131211" media="(prefers-color-scheme: dark)" />
+    <meta name="generator" content={Astro.generator} />
+    <script is:inline>
+      // Runs before paint so a chosen theme does not flash. The only blocking
+      // script on the site; everything else is static HTML.
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
+  </head>
+  <body class={wide ? 'is-wide' : ''}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

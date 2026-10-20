@@ -1,0 +1,102 @@
+---
+import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import type { GetStaticPaths } from 'astro';
+import Base from '../../layouts/Base.astro';
+import { url } from '../../lib/url';
+
+export const getStaticPaths: GetStaticPaths = async () => {
+  const entries = await getCollection('work', (e) => !e.data.draft);
+  return entries.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+};
+
+interface Props { entry: CollectionEntry<'work'> }
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+---
+
+<Base title={d.title} description={d.summary}>
+  <article>
+    <header class="case-head">
+      <div class="shell">
+        <p class="eyebrow"><a href={url('/work')}>Work</a></p>
+        <h1 class="case-head__title">{d.title}</h1>
+        <p class="lede case-head__summary">{d.summary}</p>
+
+        <dl class="case-meta">
+          <div><dt>Role</dt><dd>{d.role}</dd></div>
+          <div><dt>Period</dt><dd>{d.period}</dd></div>
+          <div><dt>Access</dt><dd>{d.access}</dd></div>
+        </dl>
+
+        {d.stack.length > 0 && (
+          <ul class="tag-row case-stack" aria-label="Stack">
+            {d.stack.map((item) => <li><span class="tag">{item}</span></li>)}
+          </ul>
+        )}
+
+        {d.note && <p class="case-note">{d.note}</p>}
+      </div>
+    </header>
+
+    <div class="shell">
+      <div class="prose">
+        <Content />
+      </div>
+
+      <p class="case-back">
+        <a class="arrow-link" href={url('/work')}>All case studies</a>
+      </p>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .case-head {
+    padding-block: clamp(2.25rem, 7vw, 3.5rem) 2rem;
+  }
+  .case-head .eyebrow a { text-decoration: none; color: inherit; }
+  .case-head .eyebrow a:hover { color: var(--accent); }
+  .case-head__title {
+    font-size: var(--step-3);
+    margin-block: 0.75rem 1rem;
+  }
+  .case-head__summary { font-size: var(--step-1); }
+
+  .case-meta {
+    display: grid;
+    gap: 0.75rem 2rem;
+    margin: 1.75rem 0 0;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--rule-soft);
+    font-size: var(--step--1);
+  }
+  @media (min-width: 34rem) {
+    .case-meta { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+  .case-meta dt {
+    color: var(--text-mute);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.2rem;
+  }
+  .case-meta dd { margin: 0; color: var(--text-soft); }
+
+  .case-stack { margin-top: 1.25rem; }
+
+  .case-note {
+    margin-top: 1.5rem;
+    padding: 0.9rem 1.1rem;
+    border: 1px dashed var(--rule);
+    border-radius: 6px;
+    background: var(--bg-sunken);
+    color: var(--text-soft);
+    font-size: var(--step--1);
+    max-width: var(--measure);
+  }
+
+  .case-back { margin-top: 3rem; font-size: var(--step--1); }
+</style>

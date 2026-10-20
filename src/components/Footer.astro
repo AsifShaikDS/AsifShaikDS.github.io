@@ -1,0 +1,32 @@
+---
+import { site, links, now } from '../data/site';
+import { url } from '../lib/url';
+const year = new Date().getFullYear();
+---
+
+<footer class="site-foot">
+  <div class="shell shell--wide">
+    <ul class="link-row site-foot__links">
+      <li><a href={`mailto:${links.email}`}>{links.email}</a></li>
+      <li><a href={links.github} rel="me noopener">GitHub</a></li>
+      <li><a href={links.linkedin} rel="me noopener">LinkedIn</a></li>
+      {links.resume && <li><a href={url(links.resume)}>Résumé (PDF)</a></li>}
+    </ul>
+    <p class="site-foot__meta muted">
+      {site.name} · {site.location} · Last updated {now.updated}
+    </p>
+    <p class="site-foot__meta muted">© {year}</p>
+  </div>
+</footer>
+
+<style>
+  .site-foot {
+    margin-top: 5rem;
+    padding-block: 2rem 3rem;
+    border-top: 1px solid var(--rule);
+    font-size: var(--step--1);
+  }
+  .site-foot__links { margin-bottom: 1rem; }
+  .site-foot__links a { overflow-wrap: anywhere; }
+  .site-foot__meta { margin: 0; }
+</style>

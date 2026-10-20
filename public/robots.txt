@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://asifshaikds.github.io/sitemap-index.xml
